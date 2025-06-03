@@ -8,8 +8,8 @@ import {
 } from "@mui/material";
 import { FaRegSave } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
-import { CaseFormSection } from "../components/CaseFormSection";
-import { CaseFormDetails } from "../components/CaseFormDetails";
+import { PersonalInfoSection } from "../components/PersonalInfoSection";
+import { Details } from "../components/Details";
 
 interface AddQuoteModalProps {
   open: boolean;
@@ -29,15 +29,15 @@ export function ViewCaseModal({ open, onClose }: AddQuoteModalProps) {
           }}
         >
           <Grid size={6}>
-            <CaseFormSection title="Primera parte" jcontet="left" />
+            <PersonalInfoSection title="Primera parte" jcontet="left" />
           </Grid>
           <Grid size={6}>
-            <CaseFormSection title="Segunda parte" jcontet="right" />
+            <PersonalInfoSection title="Segunda parte" jcontet="right" />
           </Grid>
         </Grid>
 
         {/* Detalles */}
-        <CaseFormDetails title="Detalles del caso" />
+        <Details title="Detalles del caso" />
       </DialogContent>
 
       <DialogActions sx={{ padding: "0 24px 20px 24px" }}>

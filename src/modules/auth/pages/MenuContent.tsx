@@ -12,7 +12,7 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const mainListItems = [
-  { text: "Home", icon: <HomeRoundedIcon />, path: "/" },
+  //{ text: "Home", icon: <HomeRoundedIcon />, path: "/" },
   { text: "Turnos", icon: <AnalyticsRoundedIcon />, path: "/turnos" },
   { text: "Casos", icon: <AssignmentRoundedIcon />, path: "/casos" },
 ];

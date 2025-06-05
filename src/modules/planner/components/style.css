@@ -38,8 +38,8 @@
 
 /* Eventos del calendario */
 .fc-daygrid-event {
-  background-color: #1a1a1a !important;
-  color: white !important;
+  background-color: #dedcdc !important;
+  color: rgb(4, 4, 4) !important;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.85rem;

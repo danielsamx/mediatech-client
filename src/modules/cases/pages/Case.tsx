@@ -14,7 +14,6 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AppTheme from "../../auth/components/AppTheme";
 import { useState } from "react";
@@ -194,17 +193,6 @@ export default function Case() {
                   fullWidth
                 />
               </Box>
-
-              <Button
-                variant="contained"
-                onClick={() => setOpenModal(true)}
-                color="primary"
-                startIcon={<AddCircleIcon />}
-                size="small"
-                sx={{ height: 40 }}
-              >
-                Registrar caso
-              </Button>
             </Stack>
           </Box>
           <AddCaseModal open={openModal} onClose={() => setOpenModal(false)} />

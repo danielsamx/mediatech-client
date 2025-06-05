@@ -13,7 +13,7 @@ import { styled } from "@mui/material/styles";
 import AppTheme from "../components/AppTheme";
 import ForgotPassword from "./ForgotPassword";
 import ColorModeSelect from "../../../share/components/ColorModeSelect";
-import { useNavigate } from "react-router-dom";
+import { useSignIn } from "../hooks/useSignIn";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -41,6 +41,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
+  position: "relative",
   "&::before": {
     content: '""',
     display: "block",
@@ -58,60 +59,18 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    emailError,
+    passwordError,
+    loginError,
+    handleSubmit,
+  } = useSignIn();
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
-
-  const validateInputs = () => {
-    const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage("Ingrese un email válido");
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Ingresa la contraseña");
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
-    }
-
-    return isValid;
-  };
+  const [openForgot, setOpenForgot] = React.useState(false);
 
   return (
     <AppTheme {...props}>
@@ -142,8 +101,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
                 id="email"
                 type="email"
                 name="email"
@@ -154,63 +111,70 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={emailError ? "error" : "primary"}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    passwordRef.current?.focus();
-                  }
-                }}
+                error={!!emailError}
+                helperText={emailError}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </FormControl>
+
             <FormControl>
               <FormLabel htmlFor="password">Contraseña</FormLabel>
               <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
+                id="password"
                 name="password"
                 placeholder="••••••"
                 type="password"
-                id="password"
                 autoComplete="current-password"
                 required
                 fullWidth
                 variant="outlined"
                 color={passwordError ? "error" : "primary"}
-                inputRef={passwordRef}
+                error={!!passwordError}
+                helperText={passwordError}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
 
-            <ForgotPassword open={open} handleClose={handleClose} />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
-              Sign in
+            {loginError && (
+              <Typography
+                color="error"
+                variant="body2"
+                sx={{ textAlign: "center" }}
+              >
+                {loginError}
+              </Typography>
+            )}
+
+            <ForgotPassword
+              open={openForgot}
+              handleClose={() => setOpenForgot(false)}
+            />
+            <Button type="submit" fullWidth variant="contained">
+              Iniciar sesión
             </Button>
             <Link
               component="button"
               type="button"
-              onClick={handleClickOpen}
+              onClick={() => setOpenForgot(true)}
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              Olvidaste tu contraseña?
+              ¿Olvidaste tu contraseña?
             </Link>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             <Typography sx={{ textAlign: "center" }}>
-              No tienes una cuenta?{" "}
+              ¿No tienes una cuenta?{" "}
               <Link
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate("/registrar");
-                }}
+                component="button"
+                onClick={() => handleSubmit}
                 variant="body2"
                 sx={{ alignSelf: "center" }}
               >
-                Registrate
+                Regístrate
               </Link>
             </Typography>
           </Box>

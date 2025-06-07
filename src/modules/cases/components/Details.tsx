@@ -62,11 +62,17 @@ export function Details({
                 value={detailsData.subject}
                 onChange={onChange}
               >
-                <MenuItem value="familia">Familia</MenuItem>
-                <MenuItem value="comunitarios">Grupos comunitarios</MenuItem>
-                <MenuItem value="abogados">Abogados y empresas</MenuItem>
-                <MenuItem value="publicas">Instituciones públicas</MenuItem>
-                <MenuItem value="juzgados">
+                <MenuItem value="Familia">Familia</MenuItem>
+                <MenuItem value="Grupos comunitarios">
+                  Grupos comunitarios
+                </MenuItem>
+                <MenuItem value="Abogados y empresas">
+                  Abogados y empresas
+                </MenuItem>
+                <MenuItem value="Instituciones públicas">
+                  Instituciones públicas
+                </MenuItem>
+                <MenuItem value="Derivaciones de los juzgados">
                   Derivaciones de los juzgados
                 </MenuItem>
               </Select>

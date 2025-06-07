@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Grid,
@@ -10,8 +10,10 @@ import {
 } from "@mui/material";
 import { FaRegIdBadge, FaMailBulk, FaRegSave } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
+import { MdOutlineDelete } from "react-icons/md";
 import { infoModal } from "../../../share/infoModal";
 import { usePostpone } from "../hooks/usePostpone";
+import { AddCaseModal } from "../../cases/modals/AddCaseModal";
 
 type CalendarEvent = {
   id: string;
@@ -37,6 +39,7 @@ export function ModifyPlanner({
 }: ModifyPlannerProps) {
   const startDateTime = new Date(event.start);
   const endDateTime = new Date(event.end);
+  const [openCaseModal, setOpenCaseModal] = useState(false);
 
   const dateValue = startDateTime.toISOString().slice(0, 10);
   const startTimeValue = startDateTime.toTimeString().slice(0, 5);
@@ -249,6 +252,13 @@ export function ModifyPlanner({
         <Button
           variant="contained"
           color="error"
+          startIcon={<MdOutlineDelete />}
+        >
+          Eliminar
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
           startIcon={<MdOutlineCancel />}
           disabled={!hasChanges || loading}
           onClick={handlePostpone}
@@ -256,6 +266,7 @@ export function ModifyPlanner({
           Posponer
         </Button>
         <Button
+          onClick={() => setOpenCaseModal(true)}
           type="submit"
           variant="contained"
           color="primary"
@@ -264,6 +275,14 @@ export function ModifyPlanner({
         >
           Atender
         </Button>
+        <AddCaseModal
+          dataQuote={event}
+          open={openCaseModal}
+          onClose={() => {
+            setOpenCaseModal(false);
+            onCloseDialog();
+          }}
+        ></AddCaseModal>
       </DialogActions>
     </form>
   );

@@ -16,104 +16,51 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AppTheme from "../../auth/components/AppTheme";
-import { useState } from "react";
-import { AddCaseModal } from "../modals/AddCaseModal";
+import { useEffect, useState } from "react";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const sampleData = [
-  {
-    id: 1,
-    firstPerson: "Juan Pérez Peréz Gómez",
-    secondPerson: "María López López Martinez",
-    date: "2024-06-01",
-  },
-  {
-    id: 2,
-    firstPerson: "Carlos Eduardo Díaz Ramos",
-    secondPerson: "Ana Patricia Torres Salinas",
-    date: "2024-06-02",
-  },
-  {
-    id: 3,
-    firstPerson: "Luis Alberto Gómez Mejía",
-    secondPerson: "Laura Cristina Ramírez Chávez",
-    date: "2024-06-03",
-  },
-  {
-    id: 1,
-    firstPerson: "Juan Pérez Peréz Gómez",
-    secondPerson: "María López López Martinez",
-    date: "2024-06-01",
-  },
-  {
-    id: 2,
-    firstPerson: "Carlos Eduardo Díaz Ramos",
-    secondPerson: "Ana Patricia Torres Salinas",
-    date: "2024-06-02",
-  },
-  {
-    id: 3,
-    firstPerson: "Luis Alberto Gómez Mejía",
-    secondPerson: "Laura Cristina Ramírez Chávez",
-    date: "2024-06-03",
-  },
-  {
-    id: 1,
-    firstPerson: "Juan Pérez Peréz Gómez",
-    secondPerson: "María López López Martinez",
-    date: "2024-06-01",
-  },
-  {
-    id: 2,
-    firstPerson: "Carlos Eduardo Díaz Ramos",
-    secondPerson: "Ana Patricia Torres Salinas",
-    date: "2024-06-02",
-  },
-  {
-    id: 3,
-    firstPerson: "Luis Alberto Gómez Mejía",
-    secondPerson: "Laura Cristina Ramírez Chávez",
-    date: "2024-06-03",
-  },
-  {
-    id: 1,
-    firstPerson: "Juan Pérez Peréz Gómez",
-    secondPerson: "María López López Martinez",
-    date: "2024-06-01",
-  },
-  {
-    id: 2,
-    firstPerson: "Carlos Eduardo Díaz Ramos",
-    secondPerson: "Ana Patricia Torres Salinas",
-    date: "2024-06-02",
-  },
-  {
-    id: 3,
-    firstPerson: "Luis Alberto Gómez Mejía",
-    secondPerson: "Laura Cristina Ramírez Chávez",
-    date: "2024-06-03",
-  },
-  {
-    id: 1,
-    firstPerson: "Juan Pérez Peréz Gómez",
-    secondPerson: "María López López Martinez",
-    date: "2024-06-01",
-  },
-  {
-    id: 2,
-    firstPerson: "Carlos Eduardo Díaz Ramos",
-    secondPerson: "Ana Patricia Torres Salinas",
-    date: "2024-06-02",
-  },
-  {
-    id: 3,
-    firstPerson: "Luis Alberto Gómez Mejía",
-    secondPerson: "Laura Cristina Ramírez Chávez",
-    date: "2024-06-03",
-  },
-];
+type dataCase = {
+  id: string;
+  first_involved: string;
+  second_involved: string;
+  status: string;
+  subject: string;
+  description: string;
+  name_first_involved: string;
+  name_second_involved: string;
+  register_date: string;
+  register_time: string;
+};
 
 export default function Case() {
-  const [openModal, setOpenModal] = useState(false);
+  const [data, setData] = useState<dataCase[]>([]);
+  const [searchText, setSearchText] = useState("");
+
+  const filteredData = data.filter(
+    (item) =>
+      item.name_first_involved
+        .toLowerCase()
+        .includes(searchText.toLowerCase()) ||
+      item.name_second_involved.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  useEffect(() => {
+    fetchCases();
+  }, []);
+
+  const fetchCases = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/caso`);
+      if (!response.ok) {
+        console.error("error " + response.status);
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <AppTheme>
       <Box sx={{ display: "flex", height: "90vh" }}>
@@ -154,6 +101,8 @@ export default function Case() {
                   placeholder="Caso"
                   variant="outlined"
                   size="small"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -195,15 +144,14 @@ export default function Case() {
               </Box>
             </Stack>
           </Box>
-          <AddCaseModal open={openModal} onClose={() => setOpenModal(false)} />
           <TableContainer
             component={Paper}
             sx={{
               flexGrow: 1,
               overflowY: "auto",
-              scrollbarWidth: "none", // Firefox
+              scrollbarWidth: "none",
               "&::-webkit-scrollbar": {
-                display: "none", // Chrome, Safari y Edge
+                display: "none",
               },
               backgroundColor: "white",
             }}
@@ -237,8 +185,8 @@ export default function Case() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sampleData.map((row, index) => (
-                  <TableRow key={index + "-" + row.firstPerson} hover>
+                {filteredData?.map((row, index) => (
+                  <TableRow key={index + "-" + row.id} hover>
                     <TableCell
                       sx={{
                         border: 1,
@@ -255,7 +203,7 @@ export default function Case() {
                         textAlign: "center",
                       }}
                     >
-                      {row.firstPerson}
+                      {row.name_first_involved}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -264,7 +212,7 @@ export default function Case() {
                         textAlign: "center",
                       }}
                     >
-                      {row.secondPerson}
+                      {row.name_second_involved}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -273,7 +221,7 @@ export default function Case() {
                         textAlign: "center",
                       }}
                     >
-                      {row.date}
+                      {new Date(row.register_date).toLocaleDateString("en-US")}
                     </TableCell>
                     <TableCell
                       sx={{

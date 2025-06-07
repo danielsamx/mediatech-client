@@ -282,6 +282,7 @@ export function ModifyPlanner({
             setOpenCaseModal(false);
             onCloseDialog();
           }}
+          onRefreshCalendar={onRefreshCalendar}
         ></AddCaseModal>
       </DialogActions>
     </form>

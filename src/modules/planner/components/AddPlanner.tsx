@@ -105,7 +105,7 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       <Grid container spacing={2} mb={2}>
         <Grid size={6}>
           <Box>
@@ -239,6 +239,7 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
           variant="contained"
           startIcon={<FaRegSave />}
           disabled={loading}
+          onClick={handleSubmit}
         >
           Guardar
         </Button>

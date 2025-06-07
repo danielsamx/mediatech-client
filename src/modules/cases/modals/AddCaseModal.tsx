@@ -34,9 +34,15 @@ interface AddQuoteModalProps {
   open: boolean;
   onClose: () => void;
   dataQuote: CalendarEvent;
+  onRefreshCalendar: () => void;
 }
 
-export function AddCaseModal({ open, onClose, dataQuote }: AddQuoteModalProps) {
+export function AddCaseModal({
+  open,
+  onClose,
+  dataQuote,
+  onRefreshCalendar,
+}: AddQuoteModalProps) {
   const [formData, setFormData] = useState<FormState>({
     first: { dni: "", name: "", lastname: "", phone: "", email: "" },
     second: { dni: "", name: "", lastname: "", phone: "", email: "" },
@@ -140,6 +146,7 @@ export function AddCaseModal({ open, onClose, dataQuote }: AddQuoteModalProps) {
     }
 
     const payload = {
+      id: dataQuote.id,
       firstInvolved: formData.first.dni,
       secondInvolved: formData.second.dni,
       firstName: formData.first.name,
@@ -161,6 +168,7 @@ export function AddCaseModal({ open, onClose, dataQuote }: AddQuoteModalProps) {
       if (result.message === "Caso guardado con éxito") {
         setTimeout(() => {
           infoModal("success", result.message);
+          onRefreshCalendar();
         }, 300);
       } else {
         setTimeout(() => {

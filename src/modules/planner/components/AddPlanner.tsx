@@ -86,6 +86,16 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar horas antes de enviar
+    if (form.startHour && form.endHour && form.endHour <= form.startHour) {
+      setErrors((prev) => ({
+        ...prev,
+        endHour: "La hora final debe ser mayor que la hora inicio",
+      }));
+      return;
+    }
+
     const result = await submitQuote(form);
     if (result?.success) {
       onClose();
@@ -103,6 +113,8 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
       infoModal("error", result?.message || "Error al posponer cita");
     }
   };
+
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <form>
@@ -124,42 +136,36 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
       </Grid>
 
       <Grid container spacing={2} mb={2}>
-        {(["firstInvolved", "secondInvolved"] as QuoteField[]).map(
-          (field, i) => (
-            <Grid size={6} key={field}>
-              <Box mb={1}>
-                <Typography variant="caption">
-                  {i === 0 ? "Cédula" : "Cédula"}
-                </Typography>
-              </Box>
-              <TextField
-                fullWidth
-                value={form[field]}
-                onChange={handleChange(field)}
-                error={!!errors[field]}
-                helperText={errors[field]}
-                inputProps={{ maxLength: 10 }}
-                placeholder="Cédula"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FaRegIdBadge />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          )
-        )}
+        {(["firstInvolved", "secondInvolved"] as QuoteField[]).map((field) => (
+          <Grid size={6} key={field}>
+            <Box mb={1}>
+              <Typography variant="caption">Cédula</Typography>
+            </Box>
+            <TextField
+              fullWidth
+              value={form[field]}
+              onChange={handleChange(field)}
+              error={!!errors[field]}
+              helperText={errors[field]}
+              inputProps={{ maxLength: 10 }}
+              placeholder="Cédula"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaRegIdBadge />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+        ))}
       </Grid>
 
       <Grid container spacing={2} mb={2}>
-        {(["firstEmail", "secondEmail"] as QuoteField[]).map((field, i) => (
+        {(["firstEmail", "secondEmail"] as QuoteField[]).map((field) => (
           <Grid size={6} key={field}>
             <Box mb={1}>
-              <Typography variant="caption">
-                {i === 0 ? "Email" : "Email"}
-              </Typography>
+              <Typography variant="caption">Email</Typography>
             </Box>
             <TextField
               fullWidth
@@ -187,21 +193,37 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
             { label: "Hora inicio", type: "time", field: "startHour" },
             { label: "Hora final", type: "time", field: "endHour" },
           ] as { label: string; type: string; field: QuoteField }[]
-        ).map(({ label, type, field }) => (
-          <Grid size={4} key={field}>
-            <Box mb={1}>
-              <Typography variant="caption">{label}</Typography>
-            </Box>
-            <TextField
-              type={type}
-              fullWidth
-              value={form[field]}
-              onChange={handleChange(field)}
-              placeholder={label}
-              required
-            />
-          </Grid>
-        ))}
+        ).map(({ label, type, field }) => {
+          const isEndHourError =
+            field === "endHour" &&
+            form.startHour &&
+            form.endHour &&
+            form.endHour <= form.startHour;
+
+          return (
+            <Grid size={4} key={field}>
+              <Box mb={1}>
+                <Typography variant="caption">{label}</Typography>
+              </Box>
+              <TextField
+                type={type}
+                fullWidth
+                value={form[field]}
+                onChange={handleChange(field)}
+                placeholder={label}
+                required
+                inputProps={field === "date" ? { min: today } : {}}
+                error={!!errors[field] || !!isEndHourError}
+                helperText={
+                  errors[field] ||
+                  (isEndHourError
+                    ? "La hora final debe ser mayor que la hora inicio"
+                    : "")
+                }
+              />
+            </Grid>
+          );
+        })}
       </Grid>
 
       <Grid container mb={1}>
@@ -224,6 +246,7 @@ export function AddPlanner({ onClose, onRefreshCalendar }: AddPlannerProps) {
           />
         </Grid>
       </Grid>
+
       <DialogActions>
         <Button
           onClick={onClose}

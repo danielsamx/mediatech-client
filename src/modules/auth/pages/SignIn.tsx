@@ -14,6 +14,8 @@ import AppTheme from "../components/AppTheme";
 import ForgotPassword from "./ForgotPassword";
 import ColorModeSelect from "../../../share/components/ColorModeSelect";
 import { useSignIn } from "../hooks/useSignIn";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/authContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -59,6 +61,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
+  const { login } = useAuth();
   const {
     email,
     setEmail,
@@ -68,7 +71,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     passwordError,
     loginError,
     handleSubmit,
-  } = useSignIn();
+  } = useSignIn(login);
+  const navigate = useNavigate();
 
   const [openForgot, setOpenForgot] = React.useState(false);
 
@@ -154,15 +158,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Button type="submit" fullWidth variant="contained">
               Iniciar sesión
             </Button>
-            <Link
-              component="button"
-              type="button"
-              onClick={() => setOpenForgot(true)}
-              variant="body2"
-              sx={{ alignSelf: "center" }}
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
@@ -170,7 +165,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               ¿No tienes una cuenta?{" "}
               <Link
                 component="button"
-                onClick={() => handleSubmit}
+                onClick={() => navigate("/registrar")}
                 variant="body2"
                 sx={{ alignSelf: "center" }}
               >

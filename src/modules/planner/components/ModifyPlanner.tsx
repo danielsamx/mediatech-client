@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Grid,
@@ -9,11 +9,11 @@ import {
   Typography,
 } from "@mui/material";
 import { FaRegIdBadge, FaMailBulk, FaRegSave } from "react-icons/fa";
-import { MdOutlineCancel } from "react-icons/md";
-import { MdOutlineDelete } from "react-icons/md";
+import { MdOutlineCancel, MdOutlineDelete } from "react-icons/md";
 import { infoModal } from "../../../share/infoModal";
 import { usePostpone } from "../hooks/usePostpone";
 import { AddCaseModal } from "../../cases/modals/AddCaseModal";
+import { useDeleteQuote } from "../hooks/useDeleteQuote";
 
 type CalendarEvent = {
   id: string;
@@ -62,12 +62,41 @@ export function ModifyPlanner({
     initialEnd: endTimeValue,
   });
 
+  const { deleteQuote } = useDeleteQuote();
+
+  // Para validar que la hora final sea > hora inicio
+  const [timeError, setTimeError] = useState(false);
+
+  // Validar cada vez que cambie startHour o endHour
+  useEffect(() => {
+    if (startHour && endHour) {
+      setTimeError(endHour <= startHour);
+    } else {
+      setTimeError(false);
+    }
+  }, [startHour, endHour]);
+
+  // Obtener fecha mínima = hoy (formato yyyy-mm-dd)
+  const today = new Date().toISOString().slice(0, 10);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Si hay error de hora no dejar continuar
+    if (timeError) {
+      infoModal("error", "La hora final debe ser mayor que la hora inicio");
+      return;
+    }
+
     onRefreshCalendar();
   };
 
   const handlePostpone = async () => {
+    if (timeError) {
+      infoModal("error", "La hora final debe ser mayor que la hora inicio");
+      return;
+    }
+
     const result = await postpone();
     if (result.success) {
       onCloseDialog();
@@ -84,6 +113,28 @@ export function ModifyPlanner({
       }
     } else {
       infoModal("error", result.message || "Error al posponer cita");
+    }
+  };
+
+  const handleDelete = async () => {
+    const result = await deleteQuote(Number(event.id));
+    if (result.success) {
+      onCloseDialog();
+      if (result.message === "Cita eliminada correctamente") {
+        setTimeout(() => {
+          infoModal("success", result.message);
+          onRefreshCalendar();
+          onCloseDialog();
+        }, 300);
+      } else {
+        setTimeout(() => {
+          infoModal("error", result.message);
+          console.log(result.message);
+          onRefreshCalendar();
+        }, 300);
+      }
+    } else {
+      infoModal("error", result.message || "Error al eliminar cita");
     }
   };
 
@@ -201,6 +252,9 @@ export function ModifyPlanner({
               fullWidth
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              inputProps={{ min: today }}
+              required
+              error={false}
             />
           </Box>
         </Grid>
@@ -214,6 +268,8 @@ export function ModifyPlanner({
               fullWidth
               value={startHour}
               onChange={(e) => setStartHour(e.target.value)}
+              required
+              error={false}
             />
           </Box>
         </Grid>
@@ -227,6 +283,13 @@ export function ModifyPlanner({
               fullWidth
               value={endHour}
               onChange={(e) => setEndHour(e.target.value)}
+              required
+              error={timeError}
+              helperText={
+                timeError
+                  ? "La hora final debe ser mayor que la hora inicio"
+                  : ""
+              }
             />
           </Box>
         </Grid>
@@ -251,6 +314,7 @@ export function ModifyPlanner({
       <DialogActions>
         <Button
           variant="contained"
+          onClick={handleDelete}
           color="error"
           startIcon={<MdOutlineDelete />}
         >
@@ -260,7 +324,7 @@ export function ModifyPlanner({
           variant="contained"
           color="error"
           startIcon={<MdOutlineCancel />}
-          disabled={!hasChanges || loading}
+          disabled={!hasChanges || loading || timeError}
           onClick={handlePostpone}
         >
           Posponer
@@ -271,7 +335,7 @@ export function ModifyPlanner({
           variant="contained"
           color="primary"
           startIcon={<FaRegSave />}
-          disabled={loading}
+          disabled={loading || timeError}
         >
           Atender
         </Button>
@@ -283,7 +347,7 @@ export function ModifyPlanner({
             onCloseDialog();
           }}
           onRefreshCalendar={onRefreshCalendar}
-        ></AddCaseModal>
+        />
       </DialogActions>
     </form>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export function useSignIn() {
+export function useSignIn(login: (user: any) => void) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
@@ -51,6 +51,7 @@ export function useSignIn() {
       const data = await res.json();
 
       if (data.message === "Inicio de sesión exitoso") {
+        login({ name: data.name, email: data.email });
         navigate("/turnos");
       } else {
         setLoginError(data.message);

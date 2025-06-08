@@ -14,6 +14,13 @@ import AppTheme from "../components/AppTheme";
 import ColorModeSelect from "../../../share/components/ColorModeSelect";
 import { useNavigate } from "react-router-dom";
 
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useSignUp } from "../hooks/useSignUp";
+import { infoModal } from "../../../share/infoModal";
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -63,57 +70,132 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+  const [lastNameError, setLastNameError] = React.useState(false);
+  const [lastNameErrorMessage, setLastNameErrorMessage] = React.useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
+  const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] =
+    React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const { register } = useSignUp();
+
   const navigate = useNavigate();
+
+  // Regex para solo letras y espacios
+  const nameRegex = /^[A-Za-zÀ-ÿ\s]+$/;
 
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement;
     const password = document.getElementById("password") as HTMLInputElement;
+    const confirmPassword = document.getElementById(
+      "c-password"
+    ) as HTMLInputElement;
     const name = document.getElementById("name") as HTMLInputElement;
+    const lastName = document.getElementById("lastName") as HTMLInputElement;
 
     let isValid = true;
 
+    // Validar email
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
+      setEmailErrorMessage("Ingresa un correo electrónico válido.");
       isValid = false;
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
     }
 
+    // Validar contraseña
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      setPasswordErrorMessage("La contraseña debe ser mínimo de 6 caracteres.");
       isValid = false;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
 
-    if (!name.value || name.value.length < 1) {
+    // Validar confirmar contraseña
+    if (confirmPassword.value !== password.value) {
+      setConfirmPasswordError(true);
+      setConfirmPasswordErrorMessage("Las contraseñas no coinciden.");
+      isValid = false;
+    } else {
+      setConfirmPasswordError(false);
+      setConfirmPasswordErrorMessage("");
+    }
+
+    // Validar nombre (sin números)
+    if (!name.value || !nameRegex.test(name.value)) {
       setNameError(true);
-      setNameErrorMessage("Name is required.");
+      setNameErrorMessage(
+        "Los nombres son obligatorios y no pueden contener números."
+      );
       isValid = false;
     } else {
       setNameError(false);
       setNameErrorMessage("");
     }
 
+    // Validar apellido (sin números)
+    if (!lastName.value || !nameRegex.test(lastName.value)) {
+      setLastNameError(true);
+      setLastNameErrorMessage(
+        "Los apellidos son obligatorios y no pueden contener números."
+      );
+      isValid = false;
+    } else {
+      setLastNameError(false);
+      setLastNameErrorMessage("");
+    }
+
     return isValid;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!validateInputs()) {
       return;
     }
+
     const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get("name"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const userData = {
+      email: data.get("email") as string,
+      name: data.get("name") as string,
+      lastName: data.get("lastName") as string,
+      password: data.get("password") as string,
+    };
+
+    const result = await register(userData);
+
+    if (result?.success) {
+      if (result.message === "Usuario creado exitosamente") {
+        setTimeout(() => {
+          infoModal("success", result.message);
+        }, 300);
+      } else {
+        setTimeout(() => {
+          infoModal("error", result.message);
+        }, 300);
+      }
+    } else {
+      infoModal("error", result?.message || "Error al registrar el usuario");
+    }
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword((show) => !show);
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword((show) => !show);
+  };
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
   };
 
   return (
@@ -135,17 +217,29 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Nombre completo</FormLabel>
+              <FormLabel htmlFor="name">Nombres</FormLabel>
               <TextField
                 autoComplete="name"
                 name="name"
                 required
                 fullWidth
                 id="name"
-                placeholder="Jon Snow"
                 error={nameError}
                 helperText={nameErrorMessage}
                 color={nameError ? "error" : "primary"}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="lastName">Apellidos</FormLabel>
+              <TextField
+                autoComplete="family-name"
+                name="lastName"
+                required
+                fullWidth
+                id="lastName"
+                error={lastNameError}
+                helperText={lastNameErrorMessage}
+                color={lastNameError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>
@@ -154,13 +248,12 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 required
                 fullWidth
                 id="email"
-                placeholder="your@email.com"
                 name="email"
                 autoComplete="email"
                 variant="outlined"
                 error={emailError}
                 helperText={emailErrorMessage}
-                color={passwordError ? "error" : "primary"}
+                color={emailError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>
@@ -169,38 +262,87 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 required
                 fullWidth
                 name="password"
-                placeholder="••••••"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="new-password"
                 variant="outlined"
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 color={passwordError ? "error" : "primary"}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        sx={{
+                          backgroundColor: "transparent",
+                          border: "none",
+                          boxShadow: "none",
+                          "&:hover": {
+                            backgroundColor: "rgba(0,0,0,0.04)",
+                          },
+                        }}
+                        aria-label={
+                          showPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
+                        }
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Confirmar contraseña</FormLabel>
+              <FormLabel htmlFor="c-password">Confirmar contraseña</FormLabel>
               <TextField
                 required
                 fullWidth
                 name="c-password"
-                placeholder="••••••"
-                type="c-password"
+                type={showConfirmPassword ? "text" : "password"}
                 id="c-password"
-                autoComplete="c-new-password"
+                autoComplete="new-password"
                 variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                color={passwordError ? "error" : "primary"}
+                error={confirmPasswordError}
+                helperText={confirmPasswordErrorMessage}
+                color={confirmPasswordError ? "error" : "primary"}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        sx={{
+                          backgroundColor: "transparent",
+                          border: "none",
+                          boxShadow: "none",
+                          "&:hover": {
+                            backgroundColor: "rgba(0,0,0,0.04)",
+                          },
+                        }}
+                        aria-label={
+                          showConfirmPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
+                        }
+                        onClick={handleClickShowConfirmPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               Registrar
             </Button>
           </Box>

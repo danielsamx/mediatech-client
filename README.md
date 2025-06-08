@@ -47,7 +47,17 @@ Ejecuta el proyecto en modo desarrollador con:
 npm run dev
 ```
 
-### 4. Acceder a la aplicación:
+### 4. Variable de entorno:
+
+Crear un archivo .env y definir la siguiente variable de entorno:
+
+```bash
+VITE_API_URL=http://localhost:3000
+```
+
+O donde sea que se ejecute el servidor.
+
+### 5. Acceder a la aplicación:
 
 Una vez que la aplicación esté corriendo, podrás acceder a ella en tu navegador en:
 

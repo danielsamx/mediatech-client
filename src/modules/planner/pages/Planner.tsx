@@ -1,11 +1,4 @@
-import {
-  Box,
-  Stack,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
+import { Box, Button, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AppTheme from "../../auth/components/AppTheme";
 import { useState } from "react";
@@ -47,25 +40,19 @@ export default function Planner() {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
+              alignItems: "center",
               mb: 3,
-              flexWrap: "wrap",
-              gap: 2,
             }}
           >
-            <Stack direction="row" spacing={2} alignItems="flex-end">
-              <Button
-                variant="contained"
-                onClick={() => setOpenModal(true)}
-                color="primary"
-                startIcon={<AddCircleIcon />}
-                size="small"
-                sx={{ mb: 0.5 }}
-              >
-                Agendar cita
-              </Button>
-            </Stack>
+            <Button
+              variant="contained"
+              onClick={() => setOpenModal(true)}
+              color="primary"
+              startIcon={<AddCircleIcon />}
+              size="small"
+            >
+              Agendar cita
+            </Button>
           </Box>
           <PlannerModal
             open={openModal}

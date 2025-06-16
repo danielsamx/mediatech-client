@@ -5,7 +5,7 @@ import SignIn from "./modules/auth/pages/SignIn";
 import Case from "./modules/cases/pages/Case";
 import AppLayout from "./share/AppLayout";
 import { AuthProvider } from "./modules/auth/hooks/authContext";
-import { RequireAuth } from "./modules/auth/hooks/requireAuth";
+import { RequireAuth } from "./modules/auth/hooks/RequireAuth";
 
 export default function App() {
   return (

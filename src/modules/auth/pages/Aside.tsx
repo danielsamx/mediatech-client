@@ -5,8 +5,7 @@ import Divider from "@mui/material/Divider";
 import MenuContent from "./MenuContent";
 import SelectContent from "./SelectContent";
 import AppTheme from "../components/AppTheme";
-import { Avatar, Button, Stack, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Stack } from "@mui/material";
 import OptionsMenu from "./OptionsMenu";
 
 const drawerWidth = 240;
@@ -23,7 +22,6 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
-  const navigate = useNavigate();
   return (
     <AppTheme>
       <Drawer

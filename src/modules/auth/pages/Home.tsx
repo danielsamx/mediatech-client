@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import SideMenu from "./Aside";
 import AppTheme from "../components/AppTheme";
-import ColorModeSelect from "../../../share/components/ColorModeSelect";
 
 const sampleData = [
   { id: 1, name: "Producto A", price: 120 },

@@ -1,5 +1,6 @@
 name: Mediatech react build app
 on: [push]
+
 jobs:
   build:
     runs-on: [self-hosted]

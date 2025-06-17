@@ -1,5 +1,4 @@
 name: Mediatech CI
-
 on: [push]
 
 jobs:

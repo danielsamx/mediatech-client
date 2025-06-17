@@ -1,0 +1,30 @@
+name: Mediatech react build app
+on: [push]
+jobs:
+  build:
+    runs-on: [self-hosted]
+
+    steps:
+      - name: Descargar el repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Instalar dependencias
+        run: npm install
+        working-directory: ./
+
+      - name: Ejecutar linter
+        run: npm run lint
+        working-directory: ./
+
+      - name: Ejecutar tests
+        run: npm run test
+        working-directory: ./
+
+      - name: Compilar la aplicación React
+        run: npm run build
+        working-directory: ./

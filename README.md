@@ -39,15 +39,7 @@ cd mediatech-client
 npm install
 ```
 
-### 3. Ejecución del proyecto
-
-Ejecuta el proyecto en modo desarrollador con:
-
-```bash
-npm run dev
-```
-
-### 4. Variable de entorno:
+### 3. Variable de entorno:
 
 Crear un archivo .env y definir la siguiente variable de entorno:
 
@@ -56,6 +48,16 @@ VITE_API_URL=http://localhost:3000
 ```
 
 O donde sea que se ejecute el servidor.
+
+### 4. Ejecución del proyecto
+
+Ejecuta el proyecto en modo desarrollador con:
+
+```bash
+npm run dev
+```
+
+
 
 ### 5. Acceder a la aplicación:
 
